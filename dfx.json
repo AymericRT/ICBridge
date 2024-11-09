@@ -1,0 +1,27 @@
+{
+  "canisters": {
+    "ICPBridge_backend": {
+      "candid": "src/ICPBridge_backend/ICPBridge_backend.did",
+      "package": "ICPBridge_backend",
+      "type": "rust"
+    },
+    "ICPBridge_frontend": {
+      "dependencies": [
+        "ICPBridge_backend"
+      ],
+      "source": [
+        "src/ICPBridge_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "ICPBridge_frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}

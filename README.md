@@ -1,4 +1,4 @@
-# `IC Bridge`
+# IC Bridge
 
 IC Bridge, is a simple proof-of-concept cross-chain bridge built on ICP, written Rust, that facilitates the bridging of USDC Testnet Tokens from Sepolia to Base Sepolia and vice versa. It heavily relies on the [IC-Alloy](https://ic-alloy.dev) Rust Library to abstract a lot of complexities involved with interacting with the EVM RPC and building an EIP-1559 transaction .
 
@@ -30,5 +30,77 @@ Once the Canister picks up a transfer event targeted towards the Canister's EVM 
 This project combines the three principles mentioned above: [Threshold ECDSA](https://internetcomputer.org/docs/current/developer-docs/smart-contracts/signatures/t-ecdsa), [HTTP Outcalls](https://internetcomputer.org/https-outcalls) and [Timers](https://internetcomputer.org/docs/current/developer-docs/smart-contracts/advanced-features/periodic-tasks/#timers) to create a cross-evm bridge POC in the Rust.
 
 ## Code Walk Through
-The important codes are located at [lib.rs](src/ICPBridge_backend/src/lib.rs). We used [IC-Alloy's Toolkit Template](https://github.com/ic-alloy/ic-alloy-toolkit) as heavy inspiration behind our codes.
+
+The core logic resides in **[lib.rs](src/ICPBridge_backend/src/lib.rs)**.  We used [IC-Alloy's Toolkit Template](https://github.com/ic-alloy/ic-alloy-toolkit) as heavy inspiration behind our codes.
+Below is a quick breakdown of key components:
+
+---
+
+### Timer and Asynchronous Functions
+
+**start_timer_sepolia:**  
+Starts a recurring timer that, every N seconds, spawns an asynchronous task (`async_function_sepolia`) to watch for USDC transfers on Sepolia.
+
+**start_timer_base:**  
+Starts a recurring timer that, every N seconds, spawns an asynchronous task (`async_transfer_base`) to watch for USDC transfers on Base.
+
+**async_function_sepolia:**  
+An async function that calls `watch_usdc_transfer_start_sepolia`, initiating the log-watching process for Sepolia.
+
+**async_transfer_base:**  
+An async function that calls `watch_usdc_transfer_start_base`, initiating the log-watching process for Base.
+
+---
+
+### RPC Services
+
+**get_rpc_service_sepolia:**  
+Returns a `RpcService` configured to connect to the Sepolia EVM proxy endpoint.
+
+**get_rpc_service_basesepolia:**  
+Returns a `RpcService` configured to connect to the Base-Sepolia EVM proxy endpoint.
+
+
+---
+
+### ECDSA Key Retrieval and Signer
+
+**get_ecdsa_key_name:**  
+Determines which ECDSA key name should be used based on the current DFX network environment variable.
+
+**create_icp_signer:**  
+Creates an `IcpSigner` instance using the ECDSA key name retrieved by `get_ecdsa_key_name`.
+
+---
+
+### State Management
+
+*(Managed through thread-local variables `STATE`, `ARRAY`, and `LAST_PROCESSED_BLOCK`.)*  
+No direct function for initialization—handled automatically on module load. Used by various functions to keep track of timers, logs, and polling state.
+
+---
+
+### Watching for USDC Transfers
+
+**watch_usdc_transfer_start_sepolia:**  
+Initiates a log-watching process on the Sepolia network for USDC transfers. If the target address matches the specified receiver, it triggers an asynchronous transfer function (`transfer_usdc_base`).
+
+**watch_usdc_transfer_start_base:**  
+Initiates a log-watching process on the Base network for USDC transfers. If the target address matches the specified receiver, it triggers an asynchronous transfer function (`transfer_usdc`).
+
+---
+
+### Queries
+
+**watch_usdc_transfer_is_polling:**  
+Returns `true` if a timer-based watcher is currently active and polling for logs, and `false` otherwise.
+
+**data_history:**  
+Returns a list of formatted log strings recorded during the watching process.
+
+## Conclusion
+
+The IC Bridge project demonstrates a working proof-of-concept for a **cross-chain bridge** using the Internet Computer, powered by **Threshold ECDSA**, **HTTP Outcalls**, and **Timers**. By leveraging the **IC-Alloy** library and ICP’s autonomous canister model, this bridge achieves secure, decentralized, and autonomous token transfers between Sepolia and Base Sepolia testnets.
+
+
 

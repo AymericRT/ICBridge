@@ -14,6 +14,10 @@
       ],
       "type": "assets",
       "workspace": "ICPBridge_frontend"
+    },
+    "evm_rpc": {
+      "type": "pull",
+      "id": "7hfb6-caaaa-aaaar-qadga-cai"
     }
   },
   "defaults": {

@@ -1,0 +1,8 @@
+{
+  "canisters": {
+    "7hfb6-caaaa-aaaar-qadga-cai": {
+      "arg_str": "(record {})",
+      "arg_raw": "4449444c066c03dcc690fd0301a3b299930403c98fb9b104046e026b0484809ec7047fdf92a2a4087fb3f594920d718e9bd6980f716e7e6e056d680100000000"
+    }
+  }
+}

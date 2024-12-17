@@ -23,8 +23,8 @@ const N: Duration = Duration::from_secs(15);
 
 // Timer and asynchronous functions
 #[ic_cdk::update]
-fn start_timer() {
-    ic_cdk_timers::set_timer_interval(N, || ic_cdk::spawn(async_function()));
+fn start_timer_sepolia() {
+    ic_cdk_timers::set_timer_interval(N, || ic_cdk::spawn(async_function_sepolia()));
 }
 
 #[ic_cdk::update]
@@ -32,10 +32,12 @@ fn start_timer_base() {
     ic_cdk_timers::set_timer_interval(N, || ic_cdk::spawn(async_transfer_base()));
 }
 
-async fn async_function() {
-    let _ = watch_usdc_transfer_start().await.unwrap();
+// Function to call the watch_usdc_transfer_sepolia
+async fn async_function_sepolia() {
+    let _ = watch_usdc_transfer_start_sepolia().await.unwrap();
 }
 
+// Function to call the watch_usdc_transfer_base
 async fn async_transfer_base() {
     let _ = watch_usdc_transfer_start_base().await.unwrap();
 }
@@ -103,9 +105,10 @@ sol!(
     "src/abi/USDC.json"
 );
 
-// Watch for USDC transfer logs
+
+// Watch for USDC transfer logs at Sepolia
 #[ic_cdk::update]
-pub async fn watch_usdc_transfer_start() -> Result<String, String> {
+pub async fn watch_usdc_transfer_start_sepolia() -> Result<String, String> {
     STATE.with_borrow(|state| {
         if state.timer_id.is_some() {
             return Err("Already watching for logs.".to_string());
@@ -178,28 +181,7 @@ pub async fn watch_usdc_transfer_start() -> Result<String, String> {
     Ok(format!("Watching for logs, polling {} times.", POLL_LIMIT))
 }
 
-// Stop and query transfer watch functions
-#[ic_cdk::update]
-async fn watch_usdc_transfer_stop() -> Result<String, String> {
-    STATE.with_borrow_mut(|state| {
-        if let Some(timer_id) = state.timer_id.take() {
-            ic_cdk_timers::clear_timer(timer_id);
-            Ok(())
-        } else {
-            Err("No timer to clear.".to_string())
-        }
-    })?;
-
-    Ok("Watching for logs stopped.".to_string())
-}
-
-
-#[ic_cdk::query]
-fn data_history() -> Vec<String> {
-    ARRAY.with(|array| array.borrow().clone())
-}
-
-
+// Watch for USDC transfer logs at Base
 #[ic_cdk::update]
 pub async fn watch_usdc_transfer_start_base() -> Result<String, String> {
     STATE.with_borrow(|state| {
@@ -273,6 +255,19 @@ pub async fn watch_usdc_transfer_start_base() -> Result<String, String> {
 
     Ok(format!("Watching for logs, polling {} times.", POLL_LIMIT))
 }
+
+// Check if the watch_usdc_transfer works
+#[ic_cdk::query]
+async fn watch_usdc_transfer_is_polling() -> Result<bool, String> {
+    STATE.with_borrow(|state| Ok(state.timer_id.is_some()))
+}
+
+// Query the read history
+#[ic_cdk::query]
+fn data_history() -> Vec<String> {
+    ARRAY.with(|array| array.borrow().clone())
+}
+
 
 
 export_candid!();

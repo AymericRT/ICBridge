@@ -16,7 +16,9 @@ A SENDER will transfer a small amount of USDC to the Canister's EVM address in t
 
 ![IC Bridge POC](IC-Bridge-POC.png)
 
-This approach demonstrates a simple yet effective proof of concept for a cross-EVM bridge by utilizing a liquidity provisioning model. The bridge maintains dedicated pools of USDC on both networks, enabling instant and seamless token transfers without the need for actual cross-chain token movements.
+This approach demonstrates a simple yet effective proof of concept for a cross-EVM bridge by utilizing a liquidity provisioning model. The bridge maintains dedicated pools of USDC on both networks, enabling instant and seamless token transfers.
+
+![IC Bridge POC](image1.png)
 
 ## The use of Chain Fusion Technology and Timers in this project
 Chain Fusion Technology, uses [Threshold ECDSA](https://internetcomputer.org/docs/current/developer-docs/smart-contracts/signatures/t-ecdsa), which allows canisters to have an ECSDA Public Key as well as sign messages. This imples that they are able to create valid EIP-1559 transactions.
@@ -73,12 +75,6 @@ Creates an `IcpSigner` instance using the ECDSA key name retrieved by `get_ecdsa
 
 ---
 
-### State Management
-
-*(Managed through thread-local variables `STATE`, `ARRAY`, and `LAST_PROCESSED_BLOCK`.)*  
-No direct function for initialization—handled automatically on module load. Used by various functions to keep track of timers, logs, and polling state.
-
----
 
 ### Watching for USDC Transfers
 
